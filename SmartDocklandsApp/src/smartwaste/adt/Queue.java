@@ -17,6 +17,15 @@ public class Queue<T> {
         rear = newNode;
         size++;
     }
+    
+     public T dequeue() {
+        if (isEmpty()) return null;
+        T data = front.getData();
+        front = front.getNext();
+        if (front == null) rear = null;
+        size--;
+        return data;
+    }
 
     public T peek() { return isEmpty() ? null : front.getData(); }
     public boolean isEmpty() { return size == 0; }
