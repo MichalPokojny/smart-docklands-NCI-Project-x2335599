@@ -34,6 +34,7 @@ public class SinglyLinkedList<T> implements ListWindow<T> {
             }
             current.setNext(current.getNext().getNext());
         }
+        size--;
         return true;
     }
 
