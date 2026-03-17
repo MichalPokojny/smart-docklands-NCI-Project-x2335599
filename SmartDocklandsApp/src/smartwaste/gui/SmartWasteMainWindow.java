@@ -24,6 +24,13 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
 
     public SmartWasteMainWindow() {
         initComponents();
+
+        // refresh and display first bin record in maintenance tab when clicked
+        jTabbedPane2.addChangeListener(e -> {
+            if (jTabbedPane2.getSelectedIndex() == 2) {
+                showCurrentBin();
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
