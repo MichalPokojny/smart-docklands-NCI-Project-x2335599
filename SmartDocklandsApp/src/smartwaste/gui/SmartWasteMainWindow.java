@@ -1,16 +1,14 @@
-
 package smartwaste.gui;
 
 import javax.swing.JOptionPane;
 import smartwaste.adt.*;
 import smartwaste.model.*;
 
-
 public class SmartWasteMainWindow extends javax.swing.JFrame {
-    
+
     private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
     private Queue<SmartWaste> collectionQueue = new Queue<>();
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(SmartWasteMainWindow.class.getName());
 
     public SmartWasteMainWindow() {
@@ -300,142 +298,140 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
+
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        
-    String id = txtBinID.getText();
-    String location = txtLocation.getText();
-    
-    // validate input before parsing
-    if (id.isEmpty() || location.isEmpty() || txtFillLevel.getText().isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please fill in all fields");
-        return;
-    }
-    
-    try {
-        int fill = Integer.parseInt(txtFillLevel.getText());
-        if (fill < 0 || fill > 100) {
-            JOptionPane.showMessageDialog(this, "Fill Level must be between 0 and 100");
+
+        String id = txtBinID.getText();
+        String location = txtLocation.getText();
+
+        // validate input before parsing
+        if (id.isEmpty() || location.isEmpty() || txtFillLevel.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields");
             return;
         }
-        String type = comboType.getSelectedItem().toString();
-        SmartWaste bin;
-        if (type.equals("General")) {
-            bin = new GeneralWasteBin(id, location, fill, "Active", "Mixed");
-        } else {
-            bin = new RecyclingBin(id, location, fill, "Active", "Recycling");
+
+        try {
+            int fill = Integer.parseInt(txtFillLevel.getText());
+            if (fill < 0 || fill > 100) {
+                JOptionPane.showMessageDialog(this, "Fill Level must be between 0 and 100");
+                return;
+            }
+            String type = comboType.getSelectedItem().toString();
+            SmartWaste bin;
+            if (type.equals("General")) {
+                bin = new GeneralWasteBin(id, location, fill, "Active", "Mixed");
+            } else {
+                bin = new RecyclingBin(id, location, fill, "Active", "Recycling");
+            }
+            route.add(bin);
+            refreshTable();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Fill Level must be a number");
         }
-        route.add(bin);
-        refreshTable();
-        }
-    catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Fill Level must be a number");
-        }   
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
 
-    int row = tblBins.getSelectedRow();
-    if (row >= 0) {
-        route.remove(row);
-        refreshTable();
-    } else {
-        JOptionPane.showMessageDialog(this, "Please select a bin to delete");
-    } 
+        int row = tblBins.getSelectedRow();
+        if (row >= 0) {
+            route.remove(row);
+            refreshTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a bin to delete");
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-       
-    int row = tblBins.getSelectedRow();
-    if (row >= 0) {
-        route.remove(row);
-        btnAddActionPerformed(evt); // reusing add btn logic
-        refreshTable();
-    } else {
-        JOptionPane.showMessageDialog(this, "Please select a bin to update");
-    }
-        
+
+        int row = tblBins.getSelectedRow();
+        if (row >= 0) {
+            route.remove(row);
+            btnAddActionPerformed(evt); // reusing add btn logic
+            refreshTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a bin to update");
+        }
+
     }//GEN-LAST:event_btnUpdateActionPerformed
 
-    
+
     private void btnEnqueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnqueueActionPerformed
-        
+
         int row = tblQueueBins.getSelectedRow();
         if (row >= 0) {
             collectionQueue.enqueue(route.get(row));
             refreshQueueDisplay();
         } else {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Please select a bin from the table above");
-        }  
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Please select a bin from the table above");
+        }
     }//GEN-LAST:event_btnEnqueueActionPerformed
 
     private void btnDequeueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDequeueActionPerformed
-        
+
         // Check if queue has anything in it first item
-    if (collectionQueue.isEmpty()) {
-        txtQueueOutput.setText("Queue is empty - no bins to process");
-        return;
-    }
-    
-    // Remove and return the first bin in the queue (FIFO)
-    SmartWaste bin = collectionQueue.dequeue();
-    
-    // Show what was processed so far
-    txtQueueOutput.setText("Processed and removed from queue:\n" 
-        + bin.toString() 
-        + "\n\n  Remaining Queue  \n");
-    
-    //Show what is left in the queue
-    refreshQueueDisplay();
+        if (collectionQueue.isEmpty()) {
+            txtQueueOutput.setText("Queue is empty - no bins to process");
+            return;
+        }
+
+        // Remove and return the first bin in the queue (FIFO)
+        SmartWaste bin = collectionQueue.dequeue();
+
+        // Show what was processed so far
+        txtQueueOutput.setText("Processed and removed from queue:\n"
+                + bin.toString()
+                + "\n\n  Remaining Queue  \n");
+
+        //Show what is left in the queue
+        refreshQueueDisplay();
     }//GEN-LAST:event_btnDequeueActionPerformed
 
     private void btnPeekActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPeekActionPerformed
         // Check if queue has anything in it first tiem
-    if (collectionQueue.isEmpty()) {
-        txtQueueOutput.setText("Queue is empty - nothing to peek");
-        return;
-    }
-    
-    // Look at the next bin
-    SmartWaste bin = collectionQueue.peek();
-    
-    txtQueueOutput.setText("Next bin to be collected:\n" 
-        + bin.toString()
-        + "\n\nQueue size: " + collectionQueue.size() + " items pending");
+        if (collectionQueue.isEmpty()) {
+            txtQueueOutput.setText("Queue is empty - nothing to peek");
+            return;
+        }
+
+        // Look at the next bin
+        SmartWaste bin = collectionQueue.peek();
+
+        txtQueueOutput.setText("Next bin to be collected:\n"
+                + bin.toString()
+                + "\n\nQueue size: " + collectionQueue.size() + " items pending");
     }//GEN-LAST:event_btnPeekActionPerformed
 
-     
     private void refreshQueueDisplay() {
-    // If queue is empty print message
-    if (collectionQueue.isEmpty()) {
-        txtQueueOutput.setText("Queue is empty");
-        return;
+        // If queue is empty print message
+        if (collectionQueue.isEmpty()) {
+            txtQueueOutput.setText("Queue is empty");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Current Queue (").append(collectionQueue.size()).append(" items):\n\n");
+
+        // Temp queue to read all items without modifying real queue
+        Queue<SmartWaste> temp = new Queue<>();
+        int i = 1;
+
+        while (!collectionQueue.isEmpty()) {
+            SmartWaste bin = collectionQueue.dequeue();
+            sb.append(i++).append(". ").append(bin.toString()).append("\n");
+            temp.enqueue(bin);
+        }
+
+        // Put everything back into the real queue
+        while (!temp.isEmpty()) {
+            collectionQueue.enqueue(temp.dequeue());
+        }
+
+        txtQueueOutput.setText(sb.toString());
     }
-    
-    StringBuilder sb = new StringBuilder();
-    sb.append("Current Queue (").append(collectionQueue.size()).append(" items):\n\n");
-    
-    // Temp queue to read all items without modifying real queue
-    Queue<SmartWaste> temp = new Queue<>();
-    int i = 1;
-    
-    while (!collectionQueue.isEmpty()) {
-        SmartWaste bin = collectionQueue.dequeue();
-        sb.append(i++).append(". ").append(bin.toString()).append("\n");
-        temp.enqueue(bin);
-    }
-    
-    // Put everything back into the real queue
-    while (!temp.isEmpty()) {
-        collectionQueue.enqueue(temp.dequeue());
-    }
-    
-    txtQueueOutput.setText(sb.toString());
-}
-    
+
     private void refreshTable() {
-        
+
         String[] columns = {"Bin ID", "Location", "Fill Level", "Type", "Priority"};
         String[][] data = new String[route.size()][5];
         for (int i = 0; i < route.size(); i++) {
@@ -446,15 +442,15 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
             data[i][3] = b.getClass().getSimpleName();
             data[i][4] = String.valueOf(b.getCollectionPriority());
         }
-        
+
         // refresh both Bin tables in Bins tab and Collection tab
         tblBins.setModel(
                 new javax.swing.table.DefaultTableModel(data, columns));
         tblQueueBins.setModel(
                 new javax.swing.table.DefaultTableModel(data, columns));
-      
-}
-    
+
+    }
+
     /**
      * @param args the command line arguments
      */
