@@ -855,7 +855,9 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
             data[i][0] = b.getBinID();
             data[i][1] = b.getLocation();
             data[i][2] = b.getFillLevel() + " %";
-            data[i][3] = b.getClass().getSimpleName();
+            data[i][3] = b.getClass().getSimpleName()
+                    .replace("GeneralWasteBin", "General Waste")
+                    .replace("RecyclingBin", "Recycling");
             data[i][4] = String.valueOf(b.getCollectionPriority());
         }
 
