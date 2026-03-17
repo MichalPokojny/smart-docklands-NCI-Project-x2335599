@@ -8,6 +8,9 @@ import smartwaste.model.*;
 
 public class SmartWasteMainWindow extends javax.swing.JFrame {
     
+    private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
+    private Queue<SmartWaste> collectionQueue = new Queue<>();
+    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(SmartWasteMainWindow.class.getName());
 
     public SmartWasteMainWindow() {
@@ -35,6 +38,14 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblBins = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
+        lblCollectionQueue = new javax.swing.JLabel();
+        btnEnqueue = new javax.swing.JButton();
+        btnDequeue = new javax.swing.JButton();
+        btnPeek = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblQueueBins = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtQueueOutput = new javax.swing.JTextArea();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         label1 = new java.awt.Label();
@@ -154,15 +165,68 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("Bins", jPanel2);
 
+        lblCollectionQueue.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblCollectionQueue.setText("Collection Queue");
+
+        btnEnqueue.setText("Enqueue Selected Bin");
+        btnEnqueue.addActionListener(this::btnEnqueueActionPerformed);
+
+        btnDequeue.setText("Dequeue Selected Bin");
+        btnDequeue.addActionListener(this::btnDequeueActionPerformed);
+
+        btnPeek.setText("Peek Next");
+        btnPeek.addActionListener(this::btnPeekActionPerformed);
+
+        tblQueueBins.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(tblQueueBins);
+
+        txtQueueOutput.setColumns(20);
+        txtQueueOutput.setRows(5);
+        jScrollPane2.setViewportView(txtQueueOutput);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 940, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 885, Short.MAX_VALUE)
+                    .addComponent(lblCollectionQueue, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(btnEnqueue)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnDequeue, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnPeek, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 529, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(lblCollectionQueue)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnEnqueue)
+                    .addComponent(btnDequeue)
+                    .addComponent(btnPeek))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Collection Queue", jPanel3);
@@ -235,7 +299,7 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
+
     
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         
@@ -293,18 +357,102 @@ private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
         
     }//GEN-LAST:event_btnUpdateActionPerformed
 
-    private void refreshTable() {
-    String[] columns = {"Bin ID", "Location", "Fill Level", "Type", "Priority"};
-    String[][] data = new String[route.size()][5];
-    for (int i = 0; i < route.size(); i++) {
-        SmartWaste b = route.get(i);
-        data[i][0] = b.getBinID();
-        data[i][1] = b.getLocation();
-        data[i][2] = b.getFillLevel() + " %";
-        data[i][3] = b.getClass().getSimpleName();
-        data[i][4] = String.valueOf(b.getCollectionPriority());
+    
+    private void btnEnqueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnqueueActionPerformed
+        
+        int row = tblQueueBins.getSelectedRow();
+        if (row >= 0) {
+            collectionQueue.enqueue(route.get(row));
+            refreshQueueDisplay();
+        } else {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Please select a bin from the table above");
+        }  
+    }//GEN-LAST:event_btnEnqueueActionPerformed
+
+    private void btnDequeueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDequeueActionPerformed
+        
+        // Check if queue has anything in it first item
+    if (collectionQueue.isEmpty()) {
+        txtQueueOutput.setText("Queue is empty - no bins to process");
+        return;
     }
-    tblBins.setModel(new javax.swing.table.DefaultTableModel(data, columns));
+    
+    // Remove and return the first bin in the queue (FIFO)
+    SmartWaste bin = collectionQueue.dequeue();
+    
+    // Show what was processed so far
+    txtQueueOutput.setText("Processed and removed from queue:\n" 
+        + bin.toString() 
+        + "\n\n  Remaining Queue  \n");
+    
+    //Show what is left in the queue
+    refreshQueueDisplay();
+    }//GEN-LAST:event_btnDequeueActionPerformed
+
+    private void btnPeekActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPeekActionPerformed
+        // Check if queue has anything in it first tiem
+    if (collectionQueue.isEmpty()) {
+        txtQueueOutput.setText("Queue is empty - nothing to peek");
+        return;
+    }
+    
+    // Look at the next bin
+    SmartWaste bin = collectionQueue.peek();
+    
+    txtQueueOutput.setText("Next bin to be collected:\n" 
+        + bin.toString()
+        + "\n\nQueue size: " + collectionQueue.size() + " items pending");
+    }//GEN-LAST:event_btnPeekActionPerformed
+
+     
+    private void refreshQueueDisplay() {
+    // If queue is empty print message
+    if (collectionQueue.isEmpty()) {
+        txtQueueOutput.setText("Queue is empty");
+        return;
+    }
+    
+    StringBuilder sb = new StringBuilder();
+    sb.append("Current Queue (").append(collectionQueue.size()).append(" items):\n\n");
+    
+    // Temp queue to read all items without modifying real queue
+    Queue<SmartWaste> temp = new Queue<>();
+    int i = 1;
+    
+    while (!collectionQueue.isEmpty()) {
+        SmartWaste bin = collectionQueue.dequeue();
+        sb.append(i++).append(". ").append(bin.toString()).append("\n");
+        temp.enqueue(bin);
+    }
+    
+    // Put everything back into the real queue
+    while (!temp.isEmpty()) {
+        collectionQueue.enqueue(temp.dequeue());
+    }
+    
+    txtQueueOutput.setText(sb.toString());
+}
+    
+    private void refreshTable() {
+        
+        String[] columns = {"Bin ID", "Location", "Fill Level", "Type", "Priority"};
+        String[][] data = new String[route.size()][5];
+        for (int i = 0; i < route.size(); i++) {
+            SmartWaste b = route.get(i);
+            data[i][0] = b.getBinID();
+            data[i][1] = b.getLocation();
+            data[i][2] = b.getFillLevel() + " %";
+            data[i][3] = b.getClass().getSimpleName();
+            data[i][4] = String.valueOf(b.getCollectionPriority());
+        }
+        
+        // refresh both Bin tables in Bins tab and Collection tab
+        tblBins.setModel(
+                new javax.swing.table.DefaultTableModel(data, columns));
+        tblQueueBins.setModel(
+                new javax.swing.table.DefaultTableModel(data, columns));
+      
 }
     
     /**
@@ -335,6 +483,9 @@ private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnDequeue;
+    private javax.swing.JButton btnEnqueue;
+    private javax.swing.JButton btnPeek;
     private javax.swing.JButton btnUpdate;
     private javax.swing.JComboBox<String> comboType;
     private javax.swing.JLabel jLabel1;
@@ -347,11 +498,16 @@ private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane2;
     private java.awt.Label label1;
+    private javax.swing.JLabel lblCollectionQueue;
     private javax.swing.JTable tblBins;
+    private javax.swing.JTable tblQueueBins;
     private javax.swing.JTextField txtBinID;
     private javax.swing.JTextField txtFillLevel;
     private javax.swing.JTextField txtLocation;
+    private javax.swing.JTextArea txtQueueOutput;
     // End of variables declaration//GEN-END:variables
 }
