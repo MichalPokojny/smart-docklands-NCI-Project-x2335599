@@ -67,6 +67,7 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
 
         btnUpdate.setBackground(new java.awt.Color(204, 204, 0));
         btnUpdate.setText("Update Bin");
+        btnUpdate.addActionListener(this::btnUpdateActionPerformed);
 
         btnDelete.setBackground(new java.awt.Color(255, 51, 0));
         btnDelete.setText("Delete Bin");
@@ -264,6 +265,19 @@ private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
         JOptionPane.showMessageDialog(this, "Please select a bin to delete");
     } 
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+       
+    int row = tblBins.getSelectedRow();
+    if (row >= 0) {
+        route.remove(row);
+        btnAddActionPerformed(evt); // reusing add btn logic
+        refreshTable();
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a bin to update");
+    }
+        
+    }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void refreshTable() {
     String[] columns = {"Bin ID", "Location", "Fill Level", "Type", "Priority"};
