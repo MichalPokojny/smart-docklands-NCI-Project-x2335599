@@ -13,8 +13,13 @@ public class Queue<T> {
 
     public void enqueue(T item) {
         Node<T> newNode = new Node<>(item);
-        rear.setNext(newNode);
-        rear = newNode;
+        if (rear == null) {
+        //handle first item being added to empty queue
+        front = rear = newNode;
+        } else {
+            rear.setNext(newNode);
+            rear = newNode;
+        }
         size++;
     }
     
