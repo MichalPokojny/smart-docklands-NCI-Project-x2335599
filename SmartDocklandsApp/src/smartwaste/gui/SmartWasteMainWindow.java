@@ -433,14 +433,14 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Please fill in all fields");
             return;
         }
-        
+
         // Check for duplicate Bin ID or duplicate Location
         for (int i = 0; i < route.size(); i++) {
             SmartWaste existing = route.get(i);
 
             if (existing.getBinID().equalsIgnoreCase(id)) {
-                JOptionPane.showMessageDialog(this, 
-                    "Bin ID '" + id + "' already exists. Please use a unique ID.");
+                JOptionPane.showMessageDialog(this,
+                        "Bin ID '" + id + "' already exists. Please use a unique ID.");
                 return;
             }
         }
@@ -507,13 +507,38 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     private void btnEnqueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnqueueActionPerformed
 
         int row = tblQueueBins.getSelectedRow();
-        if (row >= 0) {
-            collectionQueue.enqueue(route.get(row));
-            refreshQueueDisplay();
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "Please select a bin from the table above");
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a bin from the table above");
+            return;
         }
+
+        SmartWaste selectedBin = route.get(row);
+
+        // Check if this bin is already in the queue
+        Queue<SmartWaste> temp = new Queue<>();
+        boolean alreadyInQueue = false;
+
+        while (!collectionQueue.isEmpty()) {
+            SmartWaste bin = collectionQueue.dequeue();
+            if (bin.getBinID().equalsIgnoreCase(selectedBin.getBinID())) {
+                alreadyInQueue = true;
+            }
+            temp.enqueue(bin);
+        }
+
+        // Restore the real queue
+        while (!temp.isEmpty()) {
+            collectionQueue.enqueue(temp.dequeue());
+        }
+
+        if (alreadyInQueue) {
+            JOptionPane.showMessageDialog(this,
+                    "Bin '" + selectedBin.getBinID() + "' is already in the queue.");
+            return;
+        }
+
+        collectionQueue.enqueue(selectedBin);
+        refreshQueueDisplay();
     }//GEN-LAST:event_btnEnqueueActionPerformed
 
     /**
@@ -585,7 +610,8 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     }
 
     /**
-     * Previous Bin button - going back to previous bin in the singly linked list
+     * Previous Bin button - going back to previous bin in the singly linked
+     * list
      */
 
     private void btnPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousActionPerformed
