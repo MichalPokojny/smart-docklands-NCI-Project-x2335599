@@ -433,6 +433,17 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Please fill in all fields");
             return;
         }
+        
+        // Check for duplicate Bin ID or duplicate Location
+        for (int i = 0; i < route.size(); i++) {
+            SmartWaste existing = route.get(i);
+
+            if (existing.getBinID().equalsIgnoreCase(id)) {
+                JOptionPane.showMessageDialog(this, 
+                    "Bin ID '" + id + "' already exists. Please use a unique ID.");
+                return;
+            }
+        }
 
         try {
             int fill = Integer.parseInt(txtFillLevel.getText());
@@ -574,7 +585,7 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     }
 
     /**
-     * Previous Bin button - going back to previous bin in the linked list
+     * Previous Bin button - going back to previous bin in the singly linked list
      */
 
     private void btnPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousActionPerformed
@@ -588,7 +599,7 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnPreviousActionPerformed
 
     /**
-     * Next Bin button - going to the next bin in the linked list
+     * Next Bin button - going to the next bin in the singly linked list
      */
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
