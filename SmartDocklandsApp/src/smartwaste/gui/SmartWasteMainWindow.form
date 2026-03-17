@@ -46,15 +46,16 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jTabbedPane2" pref="0" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jTabbedPane2" alignment="0" pref="0" max="32767" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="0" pref="82" max="32767" attributes="0"/>
+                          <Component id="label1" min="-2" pref="858" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
                   <EmptySpace max="-2" attributes="0"/>
-              </Group>
-              <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="197" max="32767" attributes="0"/>
-                  <Component id="label1" min="-2" pref="602" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="153" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -626,12 +627,12 @@
         <Component class="java.awt.Label" name="label1">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Centaur" size="24" style="1"/>
+              <Font name="Book Antiqua" size="24" style="1"/>
             </Property>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="fa" green="f9" red="f8" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Smart Waste - Bin Collection Management System"/>
+            <Property name="text" type="java.lang.String" value="SmartWaste - Dublin Docklands Bin Collection Management System"/>
           </Properties>
         </Component>
       </SubComponents>
