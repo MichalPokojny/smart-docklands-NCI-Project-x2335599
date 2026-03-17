@@ -69,6 +69,9 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         txtStackOutput = new javax.swing.JTextArea();
         jPanel5 = new javax.swing.JPanel();
+        btnGenerateReport = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtReport = new javax.swing.JTextArea();
         label1 = new java.awt.Label();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -340,15 +343,33 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("Maintenance", jPanel4);
 
+        btnGenerateReport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnGenerateReport.setText("Generate Report");
+        btnGenerateReport.addActionListener(this::btnGenerateReportActionPerformed);
+
+        txtReport.setColumns(20);
+        txtReport.setRows(5);
+        jScrollPane5.setViewportView(txtReport);
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 940, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 897, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnGenerateReport, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 529, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(btnGenerateReport)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Reports", jPanel5);
@@ -428,7 +449,7 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
             if (type.equals("General")) {
                 bin = new GeneralWasteBin(id, location, fill, "Active", "Mixed");
             } else {
-                bin = new RecyclingBin(id, location, fill, "Active", "Recycling");
+                bin = new RecyclingBin(id, location, fill, "Active", "Paper & Plastic");
             }
             route.add(bin); // for storing object into the SinglyLinkedList
             refreshTable(); //update both bin tables on Bin and Queue tabs
@@ -679,6 +700,74 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnViewAllActionPerformed
 
     // =========================================================
+    // Report tab
+    // =========================================================
+    /**
+     * Generate Report button - builds a full summary of all 3 ADTs
+     */
+
+    private void btnGenerateReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateReportActionPerformed
+        StringBuilder report = new StringBuilder();
+        report.append("==========================================\n");
+        report.append("       SmartWaste System Report\n");
+        report.append("       Generated: ").append(java.time.LocalDate.now()).append("\n");
+        report.append("==========================================\n\n");
+        report.append("--- Registered Bins in Docklands Area: ")
+                .append(route.size()).append(" ---\n");
+        if (route.isEmpty()) {
+            report.append("No bins registered yet.\n");
+        } else {
+            for (int i = 0; i < route.size(); i++) {
+                report.append(i + 1).append(". ")
+                        .append(route.get(i).toString()).append("\n");
+            }
+        }
+
+        report.append("\n--- Collection Queue: --- ")
+                .append(collectionQueue.size()).append(" ---\n");
+        if (collectionQueue.isEmpty()) {
+            report.append("No bins currently in the queue.\n");
+        } else {
+            Queue<SmartWaste> temp = new Queue<>();
+            int position = 1;
+
+            while (!collectionQueue.isEmpty()) {
+                SmartWaste bin = collectionQueue.dequeue();
+                report.append(position++).append(". ").append(bin.toString()).append("\n");
+                temp.enqueue(bin);
+            }
+            while (!temp.isEmpty()) {
+                collectionQueue.enqueue(temp.dequeue());
+            }
+        }
+        report.append("\n--- Maintenance Records - Total: ")
+                .append(maintenanceStack.size()).append(" ---\n");
+
+        if (maintenanceStack.isEmpty()) {
+            report.append("No maintenance records yet.\n");
+        } else {
+            Stack<String> temp = new Stack<>();
+            int count = 1;
+
+            while (!maintenanceStack.isEmpty()) {
+                String record = maintenanceStack.pop();
+                report.append(count++).append(". ").append(record).append("\n");
+                temp.push(record);
+            }
+            while (!temp.isEmpty()) {
+                maintenanceStack.push(temp.pop());
+            }
+        }
+
+        //Footer
+        report.append("\n==========================================\n");
+        report.append("       End of Report\n");
+        report.append("==========================================\n");
+
+        txtReport.setText(report.toString());
+    }//GEN-LAST:event_btnGenerateReportActionPerformed
+
+    // =========================================================
     // REFRESH METHODS
     // =========================================================
     /**
@@ -769,6 +858,7 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnDequeue;
     private javax.swing.JButton btnEnqueue;
+    private javax.swing.JButton btnGenerateReport;
     private javax.swing.JButton btnNext;
     private javax.swing.JButton btnPeek;
     private javax.swing.JButton btnPrevious;
@@ -793,6 +883,7 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane2;
     private java.awt.Label label1;
     private javax.swing.JLabel lblCollectionQueue;
@@ -804,6 +895,7 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     private javax.swing.JTextField txtLocation;
     private javax.swing.JTextField txtMaintenanceNote;
     private javax.swing.JTextArea txtQueueOutput;
+    private javax.swing.JTextArea txtReport;
     private javax.swing.JTextArea txtStackOutput;
     // End of variables declaration//GEN-END:variables
 }
