@@ -241,18 +241,32 @@ private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
         
     String id = txtBinID.getText();
     String location = txtLocation.getText();
-    int fill = Integer.parseInt(txtFillLevel.getText());
-    String type = comboType.getSelectedItem().toString();
-
-    SmartWaste bin;
-    if (type.equals("General")) {
-        bin = new GeneralWasteBin(id, location, fill, "Active", "Mixed");
-    } else {
-        bin = new RecyclingBin(id, location, fill, "Active", "Recycling");
+    
+    // validate input before parsing
+    if (id.isEmpty() || location.isEmpty() || txtFillLevel.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill in all fields");
+        return;
     }
-    route.add(bin);
-    refreshTable();
-        
+    
+    try {
+        int fill = Integer.parseInt(txtFillLevel.getText());
+        if (fill < 0 || fill > 100) {
+            JOptionPane.showMessageDialog(this, "Fill Level must be between 0 and 100");
+            return;
+        }
+        String type = comboType.getSelectedItem().toString();
+        SmartWaste bin;
+        if (type.equals("General")) {
+            bin = new GeneralWasteBin(id, location, fill, "Active", "Mixed");
+        } else {
+            bin = new RecyclingBin(id, location, fill, "Active", "Recycling");
+        }
+        route.add(bin);
+        refreshTable();
+        }
+    catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Fill Level must be a number");
+        }   
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed

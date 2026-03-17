@@ -29,6 +29,11 @@ public class SmartDocklandsApp {
         Queue<SmartWaste> queue = new Queue<>();
         queue.enqueue(bin1); 
         System.out.println("Queue peek: " + queue.peek());
+        
+        java.awt.EventQueue.invokeLater(() -> {
+            new smartwaste.gui.SmartWasteMainWindow().setVisible(true);
+        });
+        
     }
     
 }
