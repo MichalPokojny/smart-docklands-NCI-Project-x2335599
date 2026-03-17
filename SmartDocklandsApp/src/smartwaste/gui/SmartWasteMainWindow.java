@@ -4,10 +4,21 @@ import javax.swing.JOptionPane;
 import smartwaste.adt.*;
 import smartwaste.model.*;
 
+/**
+ * SmartWasteMainWindow - Main GUI window for the Smart Waste Bin Collection
+ * System
+ */
 public class SmartWasteMainWindow extends javax.swing.JFrame {
 
+    // =========================================================
+    // CLASS-LEVEL ADT DECLARATIONS
+    // These are the 3 ADTs used throughout the application
+    // =========================================================
     private SinglyLinkedList<SmartWaste> route = new SinglyLinkedList<>();
     private Queue<SmartWaste> collectionQueue = new Queue<>();
+    private Stack<String> maintenanceStack = new Stack<>();
+
+    private int currentBinIndex = 0; // for tracking which bin are being viewed in maintenance tab
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(SmartWasteMainWindow.class.getName());
 
@@ -45,6 +56,18 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         txtQueueOutput = new javax.swing.JTextArea();
         jPanel4 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        lblCurrentBin = new javax.swing.JLabel();
+        btnPrevious = new javax.swing.JButton();
+        btnNext = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        txtMaintenanceNote = new javax.swing.JTextField();
+        btnStackPush = new javax.swing.JButton();
+        btnStackPop = new javax.swing.JButton();
+        btnStackPeek = new javax.swing.JButton();
+        btnViewAll = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        txtStackOutput = new javax.swing.JTextArea();
         jPanel5 = new javax.swing.JPanel();
         label1 = new java.awt.Label();
 
@@ -166,10 +189,10 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         lblCollectionQueue.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblCollectionQueue.setText("Collection Queue");
 
-        btnEnqueue.setText("Enqueue Selected Bin");
+        btnEnqueue.setText("Enqueue Bin");
         btnEnqueue.addActionListener(this::btnEnqueueActionPerformed);
 
-        btnDequeue.setText("Dequeue Selected Bin");
+        btnDequeue.setText("Dequeue Bin");
         btnDequeue.addActionListener(this::btnDequeueActionPerformed);
 
         btnPeek.setText("Peek Next");
@@ -203,11 +226,11 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 885, Short.MAX_VALUE)
                     .addComponent(lblCollectionQueue, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(btnEnqueue)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnDequeue, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnPeek, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnEnqueue, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDequeue, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPeek, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -229,15 +252,90 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("Collection Queue", jPanel3);
 
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel5.setText("Current Bin:");
+
+        lblCurrentBin.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblCurrentBin.setText("No bins available");
+
+        btnPrevious.setText("Previous Bin");
+        btnPrevious.addActionListener(this::btnPreviousActionPerformed);
+
+        btnNext.setText("Next Bin");
+        btnNext.addActionListener(this::btnNextActionPerformed);
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel6.setText("Maintenance Note: ");
+
+        txtMaintenanceNote.addActionListener(this::txtMaintenanceNoteActionPerformed);
+
+        btnStackPush.setText("Add Note");
+        btnStackPush.addActionListener(this::btnStackPushActionPerformed);
+
+        btnStackPop.setText("Remove Note");
+        btnStackPop.addActionListener(this::btnStackPopActionPerformed);
+
+        btnStackPeek.setText("View Latest");
+        btnStackPeek.addActionListener(this::btnStackPeekActionPerformed);
+
+        btnViewAll.setText("View All Records");
+        btnViewAll.addActionListener(this::btnViewAllActionPerformed);
+
+        txtStackOutput.setColumns(20);
+        txtStackOutput.setRows(5);
+        jScrollPane4.setViewportView(txtStackOutput);
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 940, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 897, Short.MAX_VALUE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(btnStackPush, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnStackPop, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnStackPeek, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnViewAll))
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCurrentBin, javax.swing.GroupLayout.PREFERRED_SIZE, 889, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel4Layout.createSequentialGroup()
+                            .addComponent(btnPrevious, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(txtMaintenanceNote))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 529, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblCurrentBin)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPrevious)
+                    .addComponent(btnNext))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMaintenanceNote, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnStackPush)
+                    .addComponent(btnStackPop)
+                    .addComponent(btnStackPeek)
+                    .addComponent(btnViewAll))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Maintenance", jPanel4);
@@ -298,6 +396,13 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // =========================================================
+    // BINS TAB - CRUD operations on SinglyLinkedList
+    // =========================================================
+    /**
+     * Add Bin button - validate input, creates a SmartWaste object and storeing
+     * it into the SinglyLinkedList
+     */
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
 
@@ -318,18 +423,23 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
             }
             String type = comboType.getSelectedItem().toString();
             SmartWaste bin;
+
+            // Polymorphism - creating here either GeneralWasteBin or RecyclingBin
             if (type.equals("General")) {
                 bin = new GeneralWasteBin(id, location, fill, "Active", "Mixed");
             } else {
                 bin = new RecyclingBin(id, location, fill, "Active", "Recycling");
             }
-            route.add(bin);
-            refreshTable();
+            route.add(bin); // for storing object into the SinglyLinkedList
+            refreshTable(); //update both bin tables on Bin and Queue tabs
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Fill Level must be a number");
         }
     }//GEN-LAST:event_btnAddActionPerformed
 
+    /**
+     * Delete Bin button - removes selected bin from the SinglyLinkedList
+     */
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
 
         int row = tblBins.getSelectedRow();
@@ -341,6 +451,9 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
+    /**
+     * Update Bin button - removes selected bin and add again with new values
+     */
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
 
         int row = tblBins.getSelectedRow();
@@ -354,6 +467,12 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnUpdateActionPerformed
 
+    // =========================================================
+    // COLLECTION QUEUE TAB - CRUD operations on Queue
+    // =========================================================
+    /**
+     * Enqueue button - adding selected bin from the table into the Queue
+     */
 
     private void btnEnqueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnqueueActionPerformed
 
@@ -366,6 +485,11 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
                     "Please select a bin from the table above");
         }
     }//GEN-LAST:event_btnEnqueueActionPerformed
+
+    /**
+     * Dequeue button - removing and processing the first bin in the Queue
+     * (FIFO)
+     */
 
     private void btnDequeueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDequeueActionPerformed
 
@@ -387,6 +511,10 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         refreshQueueDisplay();
     }//GEN-LAST:event_btnDequeueActionPerformed
 
+    /**
+     * Peek button - shows the next bin in the Queue without removing it
+     */
+
     private void btnPeekActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPeekActionPerformed
         // Check if queue has anything in it first tiem
         if (collectionQueue.isEmpty()) {
@@ -402,6 +530,160 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
                 + "\n\nQueue size: " + collectionQueue.size() + " items pending");
     }//GEN-LAST:event_btnPeekActionPerformed
 
+    // =========================================================
+    // MAINTENANCE TAB - Stack operations
+    // =========================================================
+    /**
+     * Showing the currently selected bin in the maintenance tab
+     */
+    private void showCurrentBin() {
+        if (route.isEmpty()) {
+            lblCurrentBin.setText("No bins available - add bins first");
+            return;
+        }
+
+        if (currentBinIndex >= route.size()) {
+            currentBinIndex = 0;
+        }
+        if (currentBinIndex < 0) {
+            currentBinIndex = route.size() - 1;
+        }
+
+        SmartWaste bin = route.get(currentBinIndex);
+        lblCurrentBin.setText(bin.toString()
+                + "  [" + (currentBinIndex + 1) + " of " + route.size() + "]");
+    }
+
+    /**
+     * Previous Bin button - going back to previous bin in the linked list
+     */
+
+    private void btnPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousActionPerformed
+        currentBinIndex--;
+        if (currentBinIndex < 0) {
+            currentBinIndex = route.size() - 1;
+        }
+        showCurrentBin();
+        txtMaintenanceNote.setText(""); // cleari note field when switching bin
+        txtStackOutput.setText("");
+    }//GEN-LAST:event_btnPreviousActionPerformed
+
+    /**
+     * Next Bin button - going to the next bin in the linked list
+     */
+
+    private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
+        currentBinIndex++;
+        if (currentBinIndex >= route.size()) {
+            currentBinIndex = 0;
+        }
+        showCurrentBin();
+        txtMaintenanceNote.setText("");
+        txtStackOutput.setText("");
+    }//GEN-LAST:event_btnNextActionPerformed
+
+    private void txtMaintenanceNoteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMaintenanceNoteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtMaintenanceNoteActionPerformed
+
+    /**
+     * Push (Add Note btn) - creating a maintenance record and pushing it to the
+     * Stack
+     */
+
+    private void btnStackPushActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStackPushActionPerformed
+        if (route.isEmpty()) {
+            txtStackOutput.setText("No bins available - add bins first");
+            return;
+        }
+
+        String note = txtMaintenanceNote.getText().trim();
+        if (note.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Please enter a maintenance note first");
+            return;
+        }
+
+        // Get current bin details and combine with note
+        SmartWaste bin = route.get(currentBinIndex);
+        String record = bin.getBinID() + " - " + note + " ["
+                + java.time.LocalDate.now() + "]";
+
+        maintenanceStack.push(record);
+        txtMaintenanceNote.setText(""); // clear the field after saving
+        txtStackOutput.setText("Record saved:\n" + record
+                + "\n\nTotal records: " + maintenanceStack.size());
+    }//GEN-LAST:event_btnStackPushActionPerformed
+
+    /**
+     * Pop (Remove Note btn) - Removing and showing most recent record form
+     * stack
+     */
+
+    private void btnStackPopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStackPopActionPerformed
+        if (maintenanceStack.isEmpty()) {
+            txtStackOutput.setText("No maintenance records yet");
+            return;
+        }
+        String record = maintenanceStack.pop();
+        txtStackOutput.setText("Removed latest record:\n" + record
+                + "\n\nRecords remaining: " + maintenanceStack.size());
+    }//GEN-LAST:event_btnStackPopActionPerformed
+
+    /**
+     * Peek (View Latest) btn - showing most recent record
+     */
+
+    private void btnStackPeekActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStackPeekActionPerformed
+        if (maintenanceStack.isEmpty()) {
+            txtStackOutput.setText("No maintenance records yet");
+            return;
+        }
+        String record = maintenanceStack.peek();
+        txtStackOutput.setText("Latest record:\n" + record
+                + "\n\nTotal records: " + maintenanceStack.size());
+    }//GEN-LAST:event_btnStackPeekActionPerformed
+
+    /**
+     * View All Records btn - displaying every item in the Stack - top to bottom
+     */
+
+    private void btnViewAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewAllActionPerformed
+        if (maintenanceStack.isEmpty()) {
+            txtStackOutput.setText("No maintenance records yet");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("All Maintenance Records:\n");
+        sb.append("─────────────────────────────\n");
+
+        Stack<String> temp = new Stack<>();
+        int count = 1;
+
+        while (!maintenanceStack.isEmpty()) {
+            String record = maintenanceStack.pop();
+            sb.append(count++).append(". ").append(record).append("\n");
+            temp.push(record);
+        }
+
+        // Restore the real stack
+        while (!temp.isEmpty()) {
+            maintenanceStack.push(temp.pop());
+        }
+
+        sb.append("─────────────────────────────\n");
+        sb.append("Total records: ").append(maintenanceStack.size());
+
+        txtStackOutput.setText(sb.toString());
+    }//GEN-LAST:event_btnViewAllActionPerformed
+
+    // =========================================================
+    // REFRESH METHODS
+    // =========================================================
+    /**
+     * Refreshes the Queue text area to show all current items in the Queue
+     */
     private void refreshQueueDisplay() {
         // If queue is empty print message
         if (collectionQueue.isEmpty()) {
@@ -430,6 +712,9 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
         txtQueueOutput.setText(sb.toString());
     }
 
+    /**
+     * Refreshing both bin tables (Bins tab and Queue tab)
+     */
     private void refreshTable() {
 
         String[] columns = {"Bin ID", "Location", "Fill Level", "Type", "Priority"};
@@ -451,6 +736,9 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
 
     }
 
+    // =========================================================
+    // APPLICATION ENTRY POINT
+    // =========================================================
     /**
      * @param args the command line arguments
      */
@@ -481,13 +769,21 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnDequeue;
     private javax.swing.JButton btnEnqueue;
+    private javax.swing.JButton btnNext;
     private javax.swing.JButton btnPeek;
+    private javax.swing.JButton btnPrevious;
+    private javax.swing.JButton btnStackPeek;
+    private javax.swing.JButton btnStackPop;
+    private javax.swing.JButton btnStackPush;
     private javax.swing.JButton btnUpdate;
+    private javax.swing.JButton btnViewAll;
     private javax.swing.JComboBox<String> comboType;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -496,14 +792,18 @@ public class SmartWasteMainWindow extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane2;
     private java.awt.Label label1;
     private javax.swing.JLabel lblCollectionQueue;
+    private javax.swing.JLabel lblCurrentBin;
     private javax.swing.JTable tblBins;
     private javax.swing.JTable tblQueueBins;
     private javax.swing.JTextField txtBinID;
     private javax.swing.JTextField txtFillLevel;
     private javax.swing.JTextField txtLocation;
+    private javax.swing.JTextField txtMaintenanceNote;
     private javax.swing.JTextArea txtQueueOutput;
+    private javax.swing.JTextArea txtStackOutput;
     // End of variables declaration//GEN-END:variables
 }
